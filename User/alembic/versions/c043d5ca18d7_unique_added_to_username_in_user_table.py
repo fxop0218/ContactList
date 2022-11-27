@@ -1,8 +1,8 @@
-"""New Migration
+"""Unique added to username in user table
 
-Revision ID: af2d516f45cf
+Revision ID: c043d5ca18d7
 Revises: 
-Create Date: 2022-11-27 15:40:31.399754
+Create Date: 2022-11-27 16:35:07.384491
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'af2d516f45cf'
+revision = 'c043d5ca18d7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('username')
     )
     op.create_index(op.f('ix_user__id'), 'user_', ['id'], unique=False)
     # ### end Alembic commands ###
