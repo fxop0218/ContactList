@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from dotenv import load_dotenv
@@ -25,19 +25,20 @@ app.add_middleware(DBSessionMiddleware, db_url=FULL_URL_DB)
 async def index():
     return {"message": "True"}
 
-@app.post("/user/", response_model=SchemaUser)
+@app.post("/user")
 async def create_user(user_: SchemaUser):
     try:
         db_user = UserModel(username=user_.username, password=encript_pwd(user_.password))
         db.session.add(db_user)
         db.session.commit()
-        return db_user
+        return ({"username": user_.username, 
+                "validation": "True"})
     except Exception as e:
-        return ({"message": "Username also exists"})
+        return ({"username": user_.username, 
+                "validation": "False"})    
     
-@app.post("/login")
+@app.get("/login")
 async def login(user_: SchemaUser):
-    print(f"{user_.password}")
     try:
         user = db.session.query(UserModel).filter_by(username=user_.username).one()
         if encript_pwd(user_.password) == user.password:
@@ -46,3 +47,19 @@ async def login(user_: SchemaUser):
     except Exception:
         return ({"message": "False"})
     
+@app.get("/all_users_admin")
+async def all_users(request: Request):
+    req_info = await request.json()
+    password = encript_pwd(req_info["password"])
+    print(f"Password sended: {encript_pwd(password)} other password: {encript_pwd(os.environ['ADMIN_PWD'])}")
+
+    if password == encript_pwd(os.environ["ADMIN_PWD"]):
+        try:
+            users = db.session.query(UserModel).all()
+            [print(x.username) for x in users]
+            return {"user": "Yes"}
+        except Exception:
+            return {"user": "admin"}
+    else: 
+        return {"user": "admin"}
+        
