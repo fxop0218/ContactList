@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from schema import User as SchemaUser
 from fastapi import FastAPI, Request 
-from models import User as UserModel
+from models import Contact as UserContract
 from dotenv import load_dotenv
 import os
 
@@ -16,3 +16,12 @@ FULL_URL_DB = f"postgresql://{USER_DB}:{PASS_DB}@{URL_DB}/{NAME_DB}" # Add this 
 
 app = FastAPI()
 app.add_middleware(DBSessionMiddleware, db_url=FULL_URL_DB)
+
+
+# FastAPI
+
+#test
+
+@app.get("/")
+async def index():
+    return {"message":"Test"}

@@ -1,9 +1,11 @@
-from sqlalchemy import Column, Table, ForeignKey, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
+from pydantic import BaseModel
 
-Base = declarative_base()
+class User(BaseModel):
+    name: str
+    email: str
+    telephone: int
+    owner: int
+    shared: list[int]
 
-class Contact(Base):
-    __tablename__ = "Conctact"
+    class Config:
+        orm_mode = True
