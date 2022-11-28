@@ -5,6 +5,7 @@ from schema import User as SchemaUser
 from fastapi import FastAPI, Request 
 from models import User as UserModel
 from dotenv import load_dotenv
+from db_comp import check_user
 import pandas as pd
 import os
 
@@ -68,6 +69,20 @@ async def all_users(request: Request):
             return {"user": "admin"}
     else: 
         return {"user": "admin"}
+    
+
+@app.post("/add_contact")
+async def add_contact(request: Request):
+    try:
+        req_json = await request.json()
+        username = req_json["username"]
+        pwd = req_json["password"]
+        if await check_user(username, pwd):
+            return {"message": "True"}
+        return {"message": "False"}
+    except:
+        return {"message": "False"}
+
         
     #req_info = await request.json()
     #password = encript_pwd(req_info["password"])

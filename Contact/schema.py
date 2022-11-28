@@ -5,7 +5,6 @@ class User(BaseModel):
     email: str
     telephone: int
     owner: int
-    shared: list[int]
 
     class Config:
         orm_mode = True
