@@ -98,6 +98,24 @@ async def add_contact(request: Request):
     except:
         return {"message": "False"}
 
+@app.delete("/delete_contact")
+async def delete_contact(request: Request):
+    try:
+        req_json = await request.json()
+        username = req_json["username"]
+        if await check_user(username, req_json["password"]):
+            user = db.session.query(UserModel).filter_by(username=username).one()
+            user.contact_id.remove(int(req_json["contact_id"]))
+            print(user.contact_id)
+            db.session.add(user)
+            db.session.commit()
+            return {"user": req_json["username"], "conctact": req_json["contact_id"], "status": "True"}
+        return {"user": req_json["username"], "conctact": req_json["contact_id"], "status": "False"}
+    except Exception as e:
+        print(f"Error: {e}")
+        return {"user": req_json["username"], "conctact": req_json["contact_id"], "status": "False"}
+
+
         
     #req_info = await request.json()
     #password = encript_pwd(req_info["password"])
