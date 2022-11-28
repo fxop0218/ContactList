@@ -76,9 +76,24 @@ async def add_contact(request: Request):
     try:
         req_json = await request.json()
         username = req_json["username"]
-        pwd = req_json["password"]
-        if await check_user(username, pwd):
-            return {"message": "True"}
+        if await check_user(username, req_json["password"]):
+            try:
+                user = db.session.query(UserModel).filter_by(username=username).one()
+                print(user.contact_id)
+
+                if user.contact_id != None:
+                    user.contact_id.append(int(req_json["contact_id"]))
+                    print("1")
+                else:
+                    print("2")
+                    user.contact_id = [req_json["contact_id"]]
+                print(user.contact_id)
+                db.session.add(user)
+                db.session.commit()
+                return {"message": "True"}
+            except Exception as e:
+                print(f"Error: {e}")
+                return {"message": "False"}
         return {"message": "False"}
     except:
         return {"message": "False"}
