@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
+from array_ex import MutableList
 
 Base = declarative_base()
 
@@ -10,4 +11,4 @@ class Contact(Base):
     email = Column(String)
     telephone = Column(Integer)
     owner = Column(Integer, nullable=False) 
-    shared = Column(ARRAY(Integer))
+    shared = Column(MutableList.as_mutable(ARRAY(Integer)))

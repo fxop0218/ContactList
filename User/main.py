@@ -8,6 +8,7 @@ from models import User as UserModel
 from dotenv import load_dotenv
 from db_comp import check_user
 import pandas as pd
+import json
 import os
 
 load_dotenv(".env")
@@ -82,26 +83,25 @@ async def all_users(request: Request):
 async def add_contact(request: Request):
     try:
         req_json = await request.json()
-        username = req_json["username"]
-        if await check_user(username, encript_pwd(req_json["password"])):
-            try:
-                user = db.session.query(UserModel).filter_by(username=username).one()
-                print(user.contact_id)
-                # TODO anly add the contact if the contact exists
-                if user.contact_id != None:
-                    user.contact_id.append(int(req_json["contact_id"]))
-                    print("1")
-                else:
-                    print("2")
-                    user.contact_id = [req_json["contact_id"]]
-                print(user.contact_id)
-                db.session.add(user)
-                db.session.commit()
-                return {"message": "True"}
-            except Exception as e:
-                print(f"Error: {e}")
-                return {"message": "False"}
-        return {"message": "False"}
+        user_id = req_json["user_id"]
+
+        try:
+            user = db.session.query(UserModel).filter_by(id=user_id).one()
+            print(user.contact_id)
+
+            if user.contact_id != None:
+                user.contact_id.append(req_json["contact_id"])
+                print("1")
+            else:
+                print("2")
+                user.contact_id = [req_json["contact_id"]]
+            print(user.contact_id)
+            db.session.add(user)
+            db.session.commit()
+            return {"message": "True"}
+        except Exception as e:
+            print(f"Error: {e}")
+            return {"message": "False"}
     except:
         return {"message": "False"}
 
@@ -133,6 +133,17 @@ async def check(request: Request):
     except Exception as e:
         print(f"Error {e}")
         return {"message": "False"}
+
+@app.get("/user_info")
+async def check(request: Request):
+    try:
+        req_json = await request.json()
+        user = db.session.query(UserModel).filter_by(username=req_json["username"]).one()
+        return user
+
+    except Exception as e: 
+        print(f"Error: {e}")
+        return {"id": "False"}
 
 
         
