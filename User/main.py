@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request 
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from helpful_functions import encript_pwd
 from schema import User as SchemaUser
@@ -19,6 +20,12 @@ FULL_URL_DB = f"postgresql://{USER_DB}:{PASS_DB}@{URL_DB}/{NAME_DB}" # Add this 
 
 app = FastAPI()
 app.add_middleware(DBSessionMiddleware, db_url=FULL_URL_DB)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"], # Permisions
+    allow_methods=["*"], # Permisions
+    allow_headers=["*"]
+)
 
 # FastAPI calls
 

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request 
 from fastapi_sqlalchemy import DBSessionMiddleware, db
+from fastapi.middleware.cors import CORSMiddleware
 from schema import User as SchemaContact
 from fastapi import FastAPI, Request 
 from models import Contact as ModelContract
@@ -16,7 +17,15 @@ NAME_DB = os.environ["DB_NAME"]
 FULL_URL_DB = f"postgresql://{USER_DB}:{PASS_DB}@{URL_DB}/{NAME_DB}" # Add this link to alembic.ini
 
 app = FastAPI()
-app.add_middleware(DBSessionMiddleware, db_url=FULL_URL_DB)
+app.add_middleware(DBSessionMiddleware, 
+    db_url=FULL_URL_DB)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"], # Permisions
+    allow_methods=["*"], # Permisions
+    allow_headers=["*"]
+)
 
 
 # FastAPI
