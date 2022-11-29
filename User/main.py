@@ -83,7 +83,7 @@ async def add_contact(request: Request):
     try:
         req_json = await request.json()
         username = req_json["username"]
-        if await check_user(username, req_json["password"]):
+        if await check_user(username, encript_pwd(req_json["password"])):
             try:
                 user = db.session.query(UserModel).filter_by(username=username).one()
                 print(user.contact_id)
@@ -110,7 +110,7 @@ async def delete_contact(request: Request):
     try:
         req_json = await request.json()
         username = req_json["username"]
-        if await check_user(username, req_json["password"]):
+        if await check_user(username, encript_pwd(req_json["password"])):
             user = db.session.query(UserModel).filter_by(username=username).one()
             user.contact_id.remove(int(req_json["contact_id"]))
             print(user.contact_id)

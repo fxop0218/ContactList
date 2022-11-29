@@ -9,6 +9,8 @@ def check_user(username: str, pwd: str):
     json_data = {"username": username, "password": pwd}
 
     resp = requests.get(cu_url, headers=headers, json=json_data)
+    if resp.status_code != 200:
+        return False
     rson = resp.json()
     print(rson)
     if (rson["message"] == "True"): 

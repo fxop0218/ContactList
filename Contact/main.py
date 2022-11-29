@@ -53,6 +53,7 @@ async def delete(request: Request):
         req_json = await request.json()
         owner = req_json["owner"]
         contact_id = req_json["contact_id"]
+        password = encript_pwd(req_json["password"])
         contract =  db.session.query(ModelContract).filter_by(id=contact_id).one()
         if contract.owner == owner:
             return {"message": "True"}
