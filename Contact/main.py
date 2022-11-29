@@ -43,7 +43,6 @@ async def delete(request: Request):
     try:
         req_json = await request.json()
         owner = req_json["owner"]
-        pwd = encript_pwd(req_json["password"])
         contact_id = req_json["contact_id"]
         contract =  db.session.query(ModelContract).filter_by(id=contact_id).one()
         if contract.owner == owner:
@@ -52,5 +51,6 @@ async def delete(request: Request):
             return {"message":"False"}
 
 
-    except:
+    except Exception as e:
+        print(f"Error: {e}")
         return {"message": "False"}

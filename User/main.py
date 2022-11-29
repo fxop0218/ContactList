@@ -80,7 +80,7 @@ async def add_contact(request: Request):
             try:
                 user = db.session.query(UserModel).filter_by(username=username).one()
                 print(user.contact_id)
-
+                # TODO anly add the contact if the contact exists
                 if user.contact_id != None:
                     user.contact_id.append(int(req_json["contact_id"]))
                     print("1")
@@ -114,6 +114,18 @@ async def delete_contact(request: Request):
     except Exception as e:
         print(f"Error: {e}")
         return {"user": req_json["username"], "conctact": req_json["contact_id"], "status": "False"}
+
+@app.get("/check_user")
+async def check(request: Request):
+    msg = "False"
+    try:
+        req_json = await request.json()
+        if await check_user(req_json["username"], req_json["password"]):
+            msg = "True"
+        return {"message" : msg}
+    except Exception as e:
+        print(f"Error {e}")
+        return {"message": "False"}
 
 
         
