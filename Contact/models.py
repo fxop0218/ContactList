@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, ARRAY
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import ARRAY
 from array_ex import MutableList
 
 Base = declarative_base()
+
 
 class Contact(Base):
     __tablename__ = "Conctact"
@@ -10,5 +12,5 @@ class Contact(Base):
     name = Column(String, nullable=False)
     email = Column(String)
     telephone = Column(Integer)
-    owner = Column(Integer, nullable=False) 
+    owner = Column(Integer, nullable=False)
     shared = Column(MutableList.as_mutable(ARRAY(Integer)))

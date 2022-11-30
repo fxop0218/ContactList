@@ -79,6 +79,19 @@ async def all():
         return {}
 
 
+@app.get("/list_contact")
+async def list_contact(request: Request):
+    try:
+        req_json = await request.json()
+        res = db.session.query(ModelContract).filter(
+            ModelContract.shared.contains([req_json["id"]])
+        )
+        return res.all()
+    except Exception as e:
+        print(f"List_contact Error: {e}")
+        return {}
+
+
 # username
 # contact_id
 @app.post("/add_user")
