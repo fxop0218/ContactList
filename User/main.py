@@ -91,13 +91,13 @@ async def add_contact(request: Request):
     try:
         req_json = await request.json()
         user_id = req_json["user_id"]
+        print(user_id)
 
         try:
             user = db.session.query(UserModel).filter_by(id=user_id).one()
             print(user.contact_id)
             if user.contact_id != None:
-                print("Xd")
-                if req_json["contact_id"] in user.contact_id:
+                if int(req_json["contact_id"]) in user.contact_id:
                     return {"message": "False", "Error2": "Duplicated field"}
                 user.contact_id.append(req_json["contact_id"])
             else:
@@ -105,6 +105,7 @@ async def add_contact(request: Request):
             print(user.contact_id)
             db.session.add(user)
             db.session.commit()
+            print("x")
             return {"message": "True"}
         except Exception as e:
             print(f"Error: {e}")
@@ -118,23 +119,28 @@ async def add_contact(request: Request):
 async def delete_contact(request: Request):
     try:
         req_json = await request.json()
-        username = req_json["username"]
-        if await check_user(username, encript_pwd(req_json["password"])):
-            user = db.session.query(UserModel).filter_by(username=username).one()
-            user.contact_id.remove(int(req_json["contact_id"]))
-            print(user.contact_id)
-            db.session.add(user)
-            db.session.commit()
+        user_id = req_json["id"]
+        user = db.session.query(UserModel).filter_by(id=user_id).one()
+
+        if req_json["contact_id"] in user.contact_id:
             return {
                 "user": req_json["username"],
                 "conctact": req_json["contact_id"],
-                "status": "True",
+                "status": "False",
             }
+
+        user.contact_id.remove(int(req_json["contact_id"]))
+        print(user.contact_id)
+
+        db.session.add(user)
+        db.session.commit()
+
         return {
             "user": req_json["username"],
             "conctact": req_json["contact_id"],
-            "status": "False",
+            "status": "True",
         }
+
     except Exception as e:
         print(f"Error: {e}")
         return {

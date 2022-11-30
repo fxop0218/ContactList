@@ -11,6 +11,7 @@ from user_api_contact import (
     get_user_inf,
     add_contact_to_user,
     get_contact_info,
+    delete_contact_to_user,
 )
 import os
 
@@ -69,6 +70,15 @@ async def crate(contact: SchemaContact):
         return {"message": "False"}
 
 
+@app.get("/all_contacts")
+async def all():
+    try:
+        contacts = db.session.query(ModelContract).all()
+        return contacts
+    except:
+        return {}
+
+
 # username
 # contact_id
 @app.post("/add_user")
@@ -91,6 +101,9 @@ async def add_user(request: Request):
         return {"message": msg}
 
 
+# owner
+# contact_id
+# owner_password
 @app.delete("/delete")
 async def delete(request: Request):
     msg = "False"
@@ -101,11 +114,43 @@ async def delete(request: Request):
         password = encript_pwd(req_json["password"])
         if check_user(contact_id, password):
             contract = db.session.query(ModelContract).filter_by(id=contact_id).one()
+
             # TODO delete contact to all users with this contact
             if contract.owner == owner:
+                print(contract.shared.len())
+                del_cont = delete_contact_to_user(contract.shared)
+                print(f"Deleted: {del_cont}")
                 msg = "True"
         return {"message": msg}
 
     except Exception as e:
         print(f"Error: {e}")
+        return {"message": "False"}
+
+
+@app.post("/share")
+async def share_contact(request: Request):
+    msg = "False"
+    try:
+        # TODO add to the contact shared list
+        req_json = await request.json()
+        cont = (
+            db.session.query(ModelContract).filter_by(id=req_json["contact_id"]).one()
+        )
+        print(cont.shared)
+        if cont.shared != None:
+            if req_json["contact_id"] in cont.shared:
+                return {"message": "False"}
+            cont.shared.append(req_json["user_id"])
+        else:
+            cont.shared = [req_json["user_id"]]
+        db.session.add(cont)
+        db.session.commit()
+
+        if add_contact_to_user(req_json["user_id"], req_json["contact_id"]):
+            msg = "True"
+
+        return {"message": msg}
+    except Exception as e:
+        print(f"share_contact Error: {e}")
         return {"message": "False"}

@@ -66,3 +66,22 @@ def get_contact_info(c_name: str, telephone: int, owner: int):
     except Exception as e:
         print(f"get_contact_info error: {e}")
         return False
+
+
+def delete_contact_to_user(user_list, contact_id: int):
+    dctu_url = URL + "delete_contact"
+    headers = {"Content-Type": "application/json"}
+    count = 0
+
+    try:
+        if user_list.len() > 0:
+            for u in user_list:
+                json_data = {"id": u, "contact_id": contact_id}
+                resp = requests.post(dctu_url, headers=headers, json=json_data)
+                rson = resp.json()
+                if rson["status"] == "True":
+                    count = count + 1
+
+            return count
+    except Exception as e:
+        print(f"get_contact_info Error: {e}")
