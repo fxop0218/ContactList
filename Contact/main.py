@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from schema import User as SchemaContact
 from fastapi import FastAPI, Request
 from models import Contact as ModelContract
+from sqlalchemy.dialects.postgresql import Any
 from dotenv import load_dotenv
 from helpful_functions import encript_pwd
 from user_api_contact import (
@@ -83,10 +84,12 @@ async def all():
 async def list_contact(request: Request):
     try:
         req_json = await request.json()
-        res = db.session.query(ModelContract).filter(
-            ModelContract.shared.contains([req_json["id"]])
+        res = (
+            db.session.query(ModelContract)
+            .filter(ModelContract.shared.any(req_json["id"]))
+            .all()
         )
-        return res.all()
+        return res
     except Exception as e:
         print(f"List_contact Error: {e}")
         return {}
