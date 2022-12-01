@@ -1,5 +1,6 @@
 import requests
 from fastapi_sqlalchemy import db
+from helpful_functions import encript_pwd
 from models import Contact as ContactModel
 
 URL = "http://localhost:8000/"
@@ -14,14 +15,13 @@ def check_user(username: str, pwd: str):
     if resp.status_code != 200:
         return False
     rson = resp.json()
-    print(rson)
     if rson["message"] == "True":
         return True
     return False
 
 
 def get_user_inf(username: str):
-    get_user_url = URL + "usr_info"
+    get_user_url = URL + "user_info"
     headers = {"Content-Type": "application/json"}
     json_data = {"username": username}
     resp = requests.get(get_user_url, headers=headers, json=json_data)
@@ -74,14 +74,17 @@ def delete_contact_to_user(user_list, contact_id: int):
     count = 0
 
     try:
-        if user_list.len() > 0:
+        if len(user_list) > 0:
             for u in user_list:
                 json_data = {"id": u, "contact_id": contact_id}
-                resp = requests.post(dctu_url, headers=headers, json=json_data)
+                resp = requests.delete(dctu_url, headers=headers, json=json_data)
                 rson = resp.json()
+                print(rson)
                 if rson["status"] == "True":
                     count = count + 1
+                    print(count)
 
             return count
     except Exception as e:
         print(f"get_contact_info Error: {e}")
+        return count

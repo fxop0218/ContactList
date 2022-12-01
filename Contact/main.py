@@ -45,20 +45,24 @@ async def index():
     return {"message": "Test"}
 
 
+# Create a contact
 @app.post("/create")
 async def crate(contact: SchemaContact):
     try:
+        # Contact base model
         db_contract = ModelContract(
             name=contact.name,
             email=contact.email,
             telephone=contact.telephone,
             owner=contact.owner,
         )
+        # Commit the changes
         db.session.add(db_contract)
         db.session.commit()
         created_contact = get_contact_info(
             c_name=contact.name, telephone=contact.telephone, owner=contact.owner
         )
+
         if add_contact_to_user(contact_id=created_contact.id, user_id=contact.owner):
             return {
                 "owner": contact.owner,
@@ -71,6 +75,7 @@ async def crate(contact: SchemaContact):
         return {"message": "False"}
 
 
+# Get all contacts
 @app.get("/all_contacts")
 async def all():
     try:
@@ -80,6 +85,7 @@ async def all():
         return {}
 
 
+# Get all contacts from a user
 @app.get("/list_contact")
 async def list_contact(request: Request):
     try:
@@ -95,6 +101,7 @@ async def list_contact(request: Request):
         return {}
 
 
+# Add a new user
 # username
 # contact_id
 @app.post("/add_user")
@@ -117,6 +124,7 @@ async def add_user(request: Request):
         return {"message": msg}
 
 
+# Delete contact
 # owner
 # contact_id
 # owner_password
@@ -128,22 +136,32 @@ async def delete(request: Request):
         owner = req_json["owner"]
         contact_id = req_json["contact_id"]
         password = encript_pwd(req_json["password"])
-        if check_user(contact_id, password):
-            contract = db.session.query(ModelContract).filter_by(id=contact_id).one()
+        print(owner, password)
+        if check_user(owner, password):
+            contact_ = db.session.query(ModelContract).filter_by(id=contact_id)
+            contact = contact_.one()
+            # TODO delete contact to all users with his contact
 
-            # TODO delete contact to all users with this contact
-            if contract.owner == owner:
-                print(contract.shared.len())
-                del_cont = delete_contact_to_user(contract.shared)
+            ownr = get_user_inf(owner)
+            print(f"{contact.owner} // {ownr['id']}")
+            print(contact.owner == ownr["id"])
+            if contact.owner == ownr["id"]:
+                print("Owner created")
+                del_cont = delete_contact_to_user(contact.shared, contact_id=contact_id)
                 print(f"Deleted: {del_cont}")
+                contact_.delete()
+                db.session.commit()
+                print(f"Deleted")
                 msg = "True"
+
         return {"message": msg}
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error delete: {e}")
         return {"message": "False"}
 
 
+# Add new shared contact to other user
 @app.post("/share")
 async def share_contact(request: Request):
     msg = "False"

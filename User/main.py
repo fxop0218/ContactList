@@ -122,14 +122,8 @@ async def delete_contact(request: Request):
         user_id = req_json["id"]
         user = db.session.query(UserModel).filter_by(id=user_id).one()
 
-        if req_json["contact_id"] in user.contact_id:
-            return {
-                "user": req_json["username"],
-                "conctact": req_json["contact_id"],
-                "status": "False",
-            }
-
-        user.contact_id.remove(int(req_json["contact_id"]))
+        print(user.contact_id)
+        user.contact_id.remove(req_json["contact_id"])
         print(user.contact_id)
 
         db.session.add(user)
@@ -142,7 +136,7 @@ async def delete_contact(request: Request):
         }
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error delete_contract: {e}")
         return {
             "user": req_json["username"],
             "conctact": req_json["contact_id"],
@@ -164,7 +158,7 @@ async def check(request: Request):
 
 
 @app.get("/user_info")
-async def check(request: Request):
+async def check_info(request: Request):
     try:
         req_json = await request.json()
         user = (
