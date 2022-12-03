@@ -23,7 +23,7 @@ export const Contacts = () => {
         <Wrapper>
             <div>
                 <Link to={"/create"} className="pt-3 pb.2 mb-3 border-bottom">
-                    Create
+                    Create contact
                 </Link>
             </div>
             <div className="table-responsive">
